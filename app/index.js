@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {colors} from '../theme';
 import Clock from '../components/Clock';
 import Record from '../components/Record';
@@ -18,9 +18,7 @@ import {Stack} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 const App = () => {
-  const {elapsedTime, isRunning, handleDone, handlePause, handleStart} =
-    useTimer();
-
+  const {time, isRunning, handleDone, handlePause, handleStart} = useTimer();
   const handleSave = () => {};
 
   let [fontsLoaded, fontError] = useFonts({
@@ -43,7 +41,7 @@ const App = () => {
   return (
     <SafeAreaView onLayout={onLayoutRootView} style={styles.appContainer}>
       <Stack.Screen options={{title: 'home'}} />
-      <Clock elapsedTime={elapsedTime} gapTime={0} />
+      <Clock elapsedTime={time} gapTime={0} />
       <Record />
       <Controls
         handleDone={handleDone}

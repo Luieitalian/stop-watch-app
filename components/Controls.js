@@ -51,7 +51,7 @@ export default Controls;
 
 const styles = StyleSheet.create({
   controlsContainer: {
-    flex: 1,
+    flex: 0.7,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',

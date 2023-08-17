@@ -1,30 +1,35 @@
-import {useState, useRef} from 'react';
+import {useState, useEffect} from 'react';
 
-const useTimer = (initialState = 0) => {
-  const [elapsedTime, setElapsedTime] = useState(initialState);
+const useTimer = () => {
+  const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
-  const countRef = useRef(null);
+
+  useEffect(() => {
+    let interval;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime + 100);
+      }, 100);
+    } else if (!isRunning) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning]);
 
   const handleStart = () => {
-    const startTime = Date.now() - elapsedTime;
-    countRef.current = setInterval(() => {
-      setElapsedTime(Date.now() - startTime);
-    }, 50);
     setIsRunning(true);
   };
 
   const handlePause = () => {
-    clearInterval(countRef.current);
     setIsRunning(false);
   };
 
   const handleDone = () => {
-    clearInterval(countRef.current);
     setIsRunning(false);
-    setElapsedTime(0);
+    setTime(0);
   };
 
-  return {elapsedTime, isRunning, handleStart, handlePause, handleDone};
+  return {time, isRunning, handleStart, handlePause, handleDone};
 };
 
 export default useTimer;

@@ -6,7 +6,6 @@ import * as Haptics from 'expo-haptics';
 const ControlButton = ({title, functionality, name}) => {
   const buttonAnim = useRef(new Animated.Value(1)).current;
   const buttonPressed = () => {
-    console.log('pressed');
     Animated.sequence([
       Animated.timing(buttonAnim, {
         toValue: 0.5,

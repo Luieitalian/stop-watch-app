@@ -1,10 +1,10 @@
 import {Pressable, StyleSheet, Text, View, Animated} from 'react-native';
-import React, {useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {colors} from '../theme';
 import * as Haptics from 'expo-haptics';
-const ControlButton = ({title}) => {
-  const buttonAnim = useRef(new Animated.Value(1)).current;
 
+const ControlButton = ({title, functionality, name}) => {
+  const buttonAnim = useRef(new Animated.Value(1)).current;
   const buttonPressed = () => {
     console.log('pressed');
     Animated.sequence([
@@ -19,8 +19,12 @@ const ControlButton = ({title}) => {
         duration: 80,
       }),
     ]).start();
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (name === 'done') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    functionality();
   };
+
   return (
     <Animated.View style={{opacity: buttonAnim}}>
       <Pressable style={styles.button} onPress={buttonPressed}>
@@ -35,9 +39,9 @@ export default ControlButton;
 const styles = StyleSheet.create({
   button: {
     backgroundColor: colors.background,
-    borderColor: colors.primaryOutline,
+    borderColor: colors.primary,
     borderRadius: 80,
-    borderWidth: 0.6,
+    borderWidth: 6,
     width: 80,
     height: 80,
     justifyContent: 'center',
@@ -45,5 +49,9 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: colors.white,
+    fontFamily: 'Inter_800ExtraBold',
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontSize: 12,
   },
 });

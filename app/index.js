@@ -1,23 +1,59 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {colors} from '../theme';
 import Clock from '../components/Clock';
 import Record from '../components/Record';
 import Controls from '../components/Controls';
-import {StatusBar, setStatusBarBackgroundColor} from 'expo-status-bar';
+import {StatusBar} from 'expo-status-bar';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_800ExtraBold,
+} from '@expo-google-fonts/inter';
+import * as SplashScreen from 'expo-splash-screen';
+import useTimer from '../hooks/useTimer';
+import {Stack} from 'expo-router';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const App = () => {
-  useEffect(() => {
-    setStatusBarBackgroundColor(colors.background);
-  }, []);
+  const {elapsedTime, isRunning, handleDone, handlePause, handleStart} =
+    useTimer();
+
+  const handleSave = () => {};
+
+  let [fontsLoaded, fontError] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_800ExtraBold,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
-    <View style={styles.appContainer}>
-      <Clock />
+    <SafeAreaView onLayout={onLayoutRootView} style={styles.appContainer}>
+      <Stack.Screen options={{title: 'home'}} />
+      <Clock elapsedTime={elapsedTime} gapTime={0} />
       <Record />
-      <Controls />
+      <Controls
+        handleDone={handleDone}
+        handleSave={handleSave}
+        handlePause={handlePause}
+        handleStart={handleStart}
+        isRunning={isRunning}
+      />
       <StatusBar style="light" />
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -3,23 +3,59 @@ import React from 'react';
 import {colors} from '../theme';
 import ControlButton from './ControlButton';
 
-const Controls = () => {
+const Controls = React.memo(function Controls({
+  handleDone,
+  handlePause,
+  handleStart,
+  handleSave,
+  isRunning,
+}) {
+  const donePressed = () => {
+    handleDone();
+  };
+
+  const savePressed = () => {
+    handleSave();
+  };
+
+  const startStopPressed = () => {
+    if (isRunning) {
+      handlePause();
+    } else {
+      handleStart();
+    }
+  };
+
   return (
     <View style={styles.controlsContainer}>
-      <ControlButton title="Done"></ControlButton>
-      <ControlButton title="Save Rec"></ControlButton>
-      <ControlButton title="Start/Stop"></ControlButton>
+      <ControlButton
+        functionality={donePressed}
+        title="Done"
+        name="done"
+      ></ControlButton>
+      <ControlButton
+        functionality={savePressed}
+        title="Save Record"
+        name="save"
+      ></ControlButton>
+      <ControlButton
+        functionality={startStopPressed}
+        title={isRunning ? 'Stop' : 'Start'}
+        name="start-stop"
+      ></ControlButton>
     </View>
   );
-};
+});
 
 export default Controls;
 
 const styles = StyleSheet.create({
   controlsContainer: {
-    flex: 2,
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
+    borderTopWidth: 1,
+    borderTopColor: colors.primaryOutline,
   },
 });

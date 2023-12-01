@@ -1,16 +1,42 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React, {useCallback, useEffect, useRef} from 'react';
+import React, { useEffect} from 'react';
 import {colors} from '../theme';
+import {useSelector, useDispatch} from 'react-redux';
+import {updateTimer, updateGap} from '../slices/timerSlice';
 
-const Clock = React.memo(function Clock({elapsedTime, gapTime}) {
-  const formatTime = useCallback((time) => {
+const Clock = React.memo(function Clock() {
+  const timerState = useSelector((state) => state.timer);
+  const recordsState = useSelector((state) => state.records);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!timerState.running) {
+      return;
+    }
+    const timeRef = setTimeout(() => dispatch(updateTimer()), 50);
+    const gapRef = setTimeout(() => dispatch(updateGap()), 50);
+    return () => {
+      clearTimeout(timeRef);
+      clearTimeout(gapRef);
+    };
+  }, [timerState, dispatch]);
+
+  const getHours = (time) => {
     const date = new Date(time).toISOString();
-    const hours = date.slice(11, 13);
-    const minutes = date.slice(14, 16);
-    const seconds = date.slice(17, 19);
-    const milliseconds = date.slice(20, -3);
-    return [hours, minutes, seconds, milliseconds];
-  }, []);
+    return date.slice(11, 13);
+  };
+  const getMinutes = (time) => {
+    const date = new Date(time).toISOString();
+    return date.slice(14, 16);
+  };
+  const getSeconds = (time) => {
+    const date = new Date(time).toISOString();
+    return date.slice(17, 19);
+  };
+  const getMilliseconds = (time) => {
+    const date = new Date(time).toISOString();
+    return date.slice(20, -3);
+  };
 
   return (
     <View style={styles.clockContainer}>
@@ -18,15 +44,31 @@ const Clock = React.memo(function Clock({elapsedTime, gapTime}) {
         <View style={styles.stick}></View>
       </View>
       <View style={styles.totalTimeContainer}>
-        <Text style={styles.elapsedTimeText}>{formatTime(elapsedTime)[0]}</Text>
+        <Text style={styles.elapsedTimeText}>{getHours(timerState.time)}</Text>
         <Text style={styles.elapsedTimeText}> : </Text>
-        <Text style={styles.elapsedTimeText}>{formatTime(elapsedTime)[1]}</Text>
+        <Text style={styles.elapsedTimeText}>
+          {getMinutes(timerState.time)}
+        </Text>
         <Text style={styles.elapsedTimeText}> : </Text>
-        <Text style={styles.elapsedTimeText}>{formatTime(elapsedTime)[2]}</Text>
+        <Text style={styles.elapsedTimeText}>
+          {getSeconds(timerState.time)}
+        </Text>
         <Text style={styles.elapsedTimeText}> .</Text>
-        <Text style={styles.elapsedTimeText}>{formatTime(elapsedTime)[3]}</Text>
+        <Text style={styles.elapsedTimeText}>
+          {getMilliseconds(timerState.time)}
+        </Text>
       </View>
-      <Text style={styles.gapTimeText}>{}</Text>
+      <Text style={styles.gapTimeText}>
+        <Text style={styles.gapTimeText}>{getHours(timerState.gap)}</Text>
+        <Text style={styles.gapTimeText}> : </Text>
+        <Text style={styles.gapTimeText}>{getMinutes(timerState.gap)}</Text>
+        <Text style={styles.gapTimeText}> : </Text>
+        <Text style={styles.gapTimeText}>{getSeconds(timerState.gap)}</Text>
+        <Text style={styles.gapTimeText}> . </Text>
+        <Text style={styles.gapTimeText}>
+          {getMilliseconds(timerState.gap)}
+        </Text>
+      </Text>
     </View>
   );
 });

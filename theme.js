@@ -5,4 +5,5 @@ export const colors = {
   background: '#121212',
   white: '#ffffff',
   black: '#000000',
+  warningColor: '#757500',
 };

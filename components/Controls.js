@@ -1,28 +1,56 @@
-import {StyleSheet, Text, View, Pressable} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import React from 'react';
 import {colors} from '../theme';
 import ControlButton from './ControlButton';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  doneTimer,
+  pauseTimer,
+  startTimer,
+  incrementLap,
+  resetGap,
+} from '../slices/timerSlice';
+import {addRecord, resetRecords} from '../slices/recordsSlice';
+const Controls = React.memo(function Controls({setIsLimitRecordsVisible}) {
+  const timerState = useSelector((state) => state.timer);
+  const recordsState = useSelector((state) => state.records);
+  const dispatch = useDispatch();
 
-const Controls = React.memo(function Controls({
-  handleDone,
-  handlePause,
-  handleStart,
-  handleSave,
-  isRunning,
-}) {
   const donePressed = () => {
-    handleDone();
+    dispatch(doneTimer());
+    dispatch(resetRecords());
   };
 
   const savePressed = () => {
-    handleSave();
+    if (recordsState.records.length >= 20) {
+      console.log('No more records!');
+      setIsLimitRecordsVisible(true);
+      setTimeout(() => {
+        setIsLimitRecordsVisible(false);
+      }, 2000);
+    } else {
+      const newRecord = {
+        lap: timerState.lap,
+        gap: timerState.gap,
+        // recordsState.records.at(-1)
+        //   ? timerState.time - recordsState.records.at(-1).totalTime
+        //   : 0,
+        totalTime: timerState.time,
+      };
+      dispatch(addRecord(newRecord));
+      dispatch(resetGap());
+      dispatch(incrementLap());
+    }
+
+    console.log('Time (ms): ', timerState.time);
+    console.log('Lap: ', timerState.lap);
   };
 
   const startStopPressed = () => {
-    if (isRunning) {
-      handlePause();
+    if (timerState.running) {
+      dispatch(pauseTimer());
     } else {
-      handleStart();
+      dispatch(startTimer());
     }
   };
 
@@ -40,7 +68,7 @@ const Controls = React.memo(function Controls({
       ></ControlButton>
       <ControlButton
         functionality={startStopPressed}
-        title={isRunning ? 'Stop' : 'Start'}
+        title={timerState.running ? 'Stop' : 'Start'}
         name="start-stop"
       ></ControlButton>
     </View>
